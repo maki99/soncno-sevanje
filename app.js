@@ -5,6 +5,45 @@ const API = "https://api.open-meteo.com/v1/forecast";
 
 let todayChart = null;
 let weekChart = null;
+let lastData = null;
+let lastLoc = null;
+
+// ---- Tema (svetla / temna) ----------------------------------------------------
+
+function effectiveTheme() {
+  const saved = localStorage.getItem("tema");
+  if (saved === "light" || saved === "dark") return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const dark = theme === "dark";
+  $("theme-icon").textContent = dark ? "☀️" : "🌙";
+  $("theme-label").textContent = dark ? "Svetlo" : "Temno";
+}
+
+function initTheme() {
+  applyTheme(effectiveTheme());
+  $("theme-toggle").addEventListener("click", () => {
+    const next =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    localStorage.setItem("tema", next);
+    applyTheme(next);
+    if (lastData) render(lastData, lastLoc); // osveži barve grafov
+  });
+  // Sledi sistemu, dokler uporabnik ne izbere ročno
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () => {
+      if (!localStorage.getItem("tema")) {
+        applyTheme(effectiveTheme());
+        if (lastData) render(lastData, lastLoc);
+      }
+    });
+}
 
 // ---- Zagon -----------------------------------------------------------------
 
@@ -119,6 +158,8 @@ async function load() {
 // ---- Prikaz ----------------------------------------------------------------
 
 function render(data, loc) {
+  lastData = data;
+  lastLoc = loc;
   const c = data.current;
   const now = new Date();
 
@@ -157,10 +198,13 @@ function render(data, loc) {
 }
 
 function chartTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (name, fallback) =>
+    (cs.getPropertyValue(name).trim() || fallback);
   return {
-    grid: "#31404f",
-    tick: "#9fb0be",
-    accent: "#ffb020",
+    grid: v("--line", "#31404f"),
+    tick: v("--muted", "#9fb0be"),
+    accent: v("--accent", "#ffb020"),
   };
 }
 
@@ -304,6 +348,7 @@ function drawWeek(data) {
 
 // ---- Osvežuj vsakih 10 minut ----------------------------------------------
 
+initTheme();
 initLocations();
 load();
 setInterval(load, 10 * 60 * 1000);

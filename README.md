@@ -10,6 +10,7 @@ za lokacijo, izbrano iz spustnega menija.
 - **Graf za danes** — potek sevanja čez dan
 - **Napoved za 7 dni** — dnevno sevanje (kWh/m²) in sončne ure
 - Čas sončnega vzhoda/zahoda in trenutna višina sonca nad obzorjem
+- **Preklop med svetlo in temno temo** (privzeto sledi nastavitvi sistema, izbira se shrani)
 
 Podatki: [Open-Meteo](https://open-meteo.com/) — brezplačno, brez API ključa.
 Vrednosti so modelska napoved, ne meritve.

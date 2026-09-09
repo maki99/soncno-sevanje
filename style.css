@@ -1,14 +1,47 @@
 :root {
+  --radius: 14px;
+
+  /* Svetla tema (privzeto) */
+  --bg: #f3f6f9;
+  --card: #ffffff;
+  --card-2: #eef2f6;
+  --card-grad: linear-gradient(135deg, #ffffff, #fff6e6);
+  --text: #17232e;
+  --muted: #5b6b78;
+  --accent: #c9760a;
+  --accent-2: #ff7a1a;
+  --line: #d9e0e6;
+}
+
+/* Temna tema — samodejno po nastavitvi sistema, če uporabnik ne izbere ročno */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1720;
+    --card: #1a2530;
+    --card-2: #223141;
+    --card-grad: linear-gradient(135deg, #1a2530, #241d16);
+    --text: #e8edf2;
+    --muted: #9fb0be;
+    --accent: #ffb020;
+    --accent-2: #ff7a1a;
+    --line: #31404f;
+  }
+}
+
+/* Ročna izbira prek gumba prevlada v obe smeri */
+:root[data-theme="dark"] {
   --bg: #0f1720;
   --card: #1a2530;
   --card-2: #223141;
+  --card-grad: linear-gradient(135deg, #1a2530, #241d16);
   --text: #e8edf2;
   --muted: #9fb0be;
   --accent: #ffb020;
   --accent-2: #ff7a1a;
   --line: #31404f;
-  --radius: 14px;
 }
+
+:root { color-scheme: light dark; }
 
 * { box-sizing: border-box; }
 
@@ -43,6 +76,22 @@ header h1 {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+#theme-toggle {
+  margin-left: auto;
+  background: var(--card-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#theme-toggle:hover { border-color: var(--accent); }
 
 .controls label {
   color: var(--muted);
@@ -93,7 +142,7 @@ main {
   gap: 24px;
   flex-wrap: wrap;
   align-items: center;
-  background: linear-gradient(135deg, #1a2530, #241d16);
+  background: var(--card-grad);
 }
 
 .current-main { flex: 1 1 220px; }
