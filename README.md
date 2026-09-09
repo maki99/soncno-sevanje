@@ -1,5 +1,7 @@
 # ☀️ Moč sončnega sevanja
 
+**Živa stran:** <https://maki99.github.io/soncno-sevanje/>
+
 Preprosta statična spletna stran, ki prikazuje moč sončnega sevanja (osvetljenosti)
 za lokacijo, izbrano iz spustnega menija.
 
@@ -34,9 +36,9 @@ Koordinate dobiš z desnim klikom na [openstreetmap.org](https://www.openstreetm
 
 ## Objava na GitHub Pages
 
-1. Push na GitHub (glej spodaj).
-2. V repozitoriju: **Settings → Pages → Source: Deploy from a branch → `main` / `/ (root)`**.
-3. Stran bo na `https://<uporabnik>.github.io/<repo>/`.
+Že vklopljeno: **Settings → Pages → Deploy from a branch → `main` / `/ (root)`**.
+Ob vsakem `git push` na `main` se stran samodejno posodobi na
+<https://maki99.github.io/soncno-sevanje/>.
 
 ## Struktura
 
