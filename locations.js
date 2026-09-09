@@ -28,6 +28,7 @@ window.LOCATIONS = [
   { name: "Ljubljana",           lat: 46.0511, lon: 14.5051 },
   { name: "Ljutomer",            lat: 46.5192, lon: 16.1972 },
   { name: "Logatec",             lat: 45.9128, lon: 14.2261 },
+  { name: "Mačkovci (Puconci)",  lat: 46.7186, lon: 16.1719 },
   { name: "Maribor",             lat: 46.5547, lon: 15.6459 },
   { name: "Metlika",             lat: 45.6472, lon: 15.3122 },
   { name: "Moravske Toplice",    lat: 46.6853, lon: 16.2217 },
