@@ -52,23 +52,53 @@ function initTheme() {
 
 // ---- Zagon -----------------------------------------------------------------
 
+const locByName = new Map(LOCATIONS.map((l) => [l.name.toLowerCase(), l]));
+
+function selectedLoc() {
+  return locByName.get($("location").value.trim().toLowerCase()) || null;
+}
+
 function initLocations() {
-  const sel = $("location");
+  const input = $("location");
+  const dl = $("loc-list");
   const saved = localStorage.getItem("lokacija");
-  LOCATIONS.forEach((loc, i) => {
-    const opt = document.createElement("option");
-    opt.value = String(i);
-    opt.textContent = loc.name;
-    sel.appendChild(opt);
+
+  input.value =
+    saved && locByName.has(saved.toLowerCase()) ? saved : DEFAULT_LOCATION;
+
+  // Datalist napolnimo sproti glede na vpisano besedilo (največ 60 zadetkov),
+  // da ne ustvarimo 6000+ DOM elementov.
+  function fillOptions() {
+    const q = input.value.trim().toLowerCase();
+    dl.textContent = "";
+    if (q.length < 2) return;
+    const starts = [];
+    const contains = [];
+    for (const l of LOCATIONS) {
+      const n = l.name.toLowerCase();
+      if (n.startsWith(q)) starts.push(l.name);
+      else if (n.includes(q)) contains.push(l.name);
+      if (starts.length >= 60) break;
+    }
+    for (const name of starts.concat(contains).slice(0, 60)) {
+      const o = document.createElement("option");
+      o.value = name;
+      dl.appendChild(o);
+    }
+  }
+
+  let t = null;
+  input.addEventListener("input", () => {
+    fillOptions();
+    const loc = selectedLoc();
+    if (loc) {
+      localStorage.setItem("lokacija", loc.name);
+      clearTimeout(t);
+      t = setTimeout(load, 150);
+    }
   });
-  const defaultIdx = LOCATIONS.findIndex(
-    (l) => l.name === (saved || DEFAULT_LOCATION)
-  );
-  sel.value = String(defaultIdx >= 0 ? defaultIdx : 0);
-  sel.addEventListener("change", () => {
-    localStorage.setItem("lokacija", LOCATIONS[Number(sel.value)].name);
-    load();
-  });
+  input.addEventListener("focus", () => input.select());
+  fillOptions();
 }
 
 // ---- Pomožne funkcije -----------------------------------------------------
@@ -134,7 +164,11 @@ function sunElevation(date, lat, lon) {
 // ---- Nalaganje podatkov -------------------------------------------------------
 
 async function load() {
-  const loc = LOCATIONS[Number($("location").value)];
+  const loc = selectedLoc();
+  if (!loc) {
+    $("meta").textContent = "Vpiši ime kraja in ga izberi s seznama.";
+    return;
+  }
   $("meta").textContent = `Nalagam podatke za ${loc.name} …`;
   $("meta").classList.remove("error");
 

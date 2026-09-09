@@ -98,15 +98,20 @@ header h1 {
   font-size: 0.9rem;
 }
 
-select {
+select,
+#location {
   background: var(--card-2);
   color: var(--text);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 1rem;
-  min-width: 200px;
+  min-width: 240px;
+  font-family: inherit;
 }
+
+#location::placeholder { color: var(--muted); }
+#location:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .meta {
   color: var(--muted);
