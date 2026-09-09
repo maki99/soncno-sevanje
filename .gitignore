@@ -10,3 +10,7 @@ Thumbs.db
 # Log / začasno
 *.log
 node_modules/
+
+# Python
+__pycache__/
+*.pyc
