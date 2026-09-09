@@ -21,28 +21,33 @@ function effectiveTheme() {
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   const dark = theme === "dark";
-  $("theme-icon").textContent = dark ? "☀️" : "🌙";
-  $("theme-label").textContent = dark ? "Svetlo" : "Temno";
+  const icon = $("theme-icon");
+  const label = $("theme-label");
+  if (icon) icon.textContent = dark ? "☀️" : "🌙";
+  if (label) label.textContent = dark ? "Svetlo" : "Temno";
+}
+
+function toggleTheme() {
+  const next =
+    document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  localStorage.setItem("tema", next);
+  applyTheme(next);
+  if (lastData) render(lastData, lastLoc); // osveži barve grafov
 }
 
 function initTheme() {
   applyTheme(effectiveTheme());
-  $("theme-toggle").addEventListener("click", () => {
-    const next =
-      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    localStorage.setItem("tema", next);
-    applyTheme(next);
-    if (lastData) render(lastData, lastLoc); // osveži barve grafov
-  });
+  const btn = $("theme-toggle");
+  if (btn) btn.addEventListener("click", toggleTheme);
+
   // Sledi sistemu, dokler uporabnik ne izbere ročno
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", () => {
-      if (!localStorage.getItem("tema")) {
-        applyTheme(effectiveTheme());
-        if (lastData) render(lastData, lastLoc);
-      }
-    });
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener("change", () => {
+    if (!localStorage.getItem("tema")) {
+      applyTheme(effectiveTheme());
+      if (lastData) render(lastData, lastLoc);
+    }
+  });
 }
 
 // ---- Zagon -----------------------------------------------------------------
