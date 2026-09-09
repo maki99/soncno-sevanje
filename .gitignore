@@ -1,0 +1,12 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Uredniki
+.vscode/
+.idea/
+*.swp
+
+# Log / začasno
+*.log
+node_modules/

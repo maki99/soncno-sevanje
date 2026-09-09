@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Prikaz moči sončnega sevanja (osvetljenosti) za izbrano lokacijo. Podatki: Open-Meteo." />
+  <title>Moč sončnega sevanja</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%80%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>☀️ Moč sončnega sevanja</h1>
+      <div class="controls">
+        <label for="location">Lokacija</label>
+        <select id="location" aria-label="Izberi lokacijo"></select>
+      </div>
+      <p id="meta" class="meta">Nalagam …</p>
+    </header>
+
+    <main>
+      <section class="card current" aria-live="polite">
+        <div class="current-main">
+          <div class="big">
+            <span id="ghi-now">–</span><span class="unit">W/m²</span>
+          </div>
+          <p id="condition" class="condition">–</p>
+        </div>
+        <ul class="quick">
+          <li><span class="k">Oblačnost</span><span class="v" id="cloud">–</span></li>
+          <li><span class="k">Temperatura</span><span class="v" id="temp">–</span></li>
+          <li><span class="k">Višina sonca</span><span class="v" id="elevation">–</span></li>
+          <li><span class="k">Vzhod / zahod</span><span class="v" id="sun">–</span></li>
+        </ul>
+      </section>
+
+      <section class="grid3">
+        <div class="card mini">
+          <span class="k">GHI — globalno</span>
+          <span class="v" id="ghi">–</span>
+          <span class="hint">na vodoravno ploskev</span>
+        </div>
+        <div class="card mini">
+          <span class="k">DNI — direktno</span>
+          <span class="v" id="dni">–</span>
+          <span class="hint">pravokotno na žarke</span>
+        </div>
+        <div class="card mini">
+          <span class="k">DHI — difuzno</span>
+          <span class="v" id="dhi">–</span>
+          <span class="hint">razpršeno z neba</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Sevanje danes</h2>
+        <div class="chart-box"><canvas id="todayChart"></canvas></div>
+      </section>
+
+      <section class="card">
+        <h2>Napoved za teden</h2>
+        <div class="chart-box"><canvas id="weekChart"></canvas></div>
+        <div id="forecast" class="forecast"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Vir podatkov: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> ·
+      GHI = shortwave radiation. Vrednosti so modelska napoved, ne meritev.</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="locations.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
