@@ -90,6 +90,16 @@ function initMap() {
         "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community",
     }
   ).addTo(map);
+
+  // Leaflet meri velikost vsebnika ob inicializaciji; če se ta kasneje
+  // spremeni (nalaganje pisav, sprememba velikosti okna, mobilni obrat),
+  // je treba zemljevid o tem obvestiti, sicer ostanejo delčki sivi.
+  setTimeout(() => map.invalidateSize(), 300);
+  let resizeT = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => map.invalidateSize(), 150);
+  });
 }
 
 function placeHouseMarker(lat, lon) {
@@ -254,7 +264,29 @@ function addArray(overrides) {
   renderArrays();
   saveState();
   scheduleRecompute();
+  focusArray(arr);
   return arr;
+}
+
+// Poskrbi, da je novo dodan niz očitno viden: povleče pogled do njegove
+// kartice in do markerja na zemljevidu (sicer se doda na dno seznama /
+// na del zemljevida, ki ni nujno viden, kar je zgledalo, kot da se "nič
+// ne zgodi").
+function focusArray(arr) {
+  const box = $("arrays");
+  const card = box.lastElementChild;
+  if (card) {
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    card.classList.add("flash");
+    setTimeout(() => card.classList.remove("flash"), 1500);
+  }
+  if (map) {
+    try {
+      if (!map.getBounds().contains([arr.lat, arr.lon])) {
+        map.panTo([arr.lat, arr.lon]);
+      }
+    } catch (e) {}
+  }
 }
 
 function removeArray(id) {

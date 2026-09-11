@@ -95,6 +95,13 @@
   padding: 12px 14px;
   display: grid;
   gap: 10px;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.array-card.flash {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.35);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .array-card .row1 {
