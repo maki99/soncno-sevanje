@@ -138,7 +138,7 @@ function destPoint(lat, lon, bearingDeg, distM) {
   return [(lat2 * 180) / Math.PI, (lon2 * 180) / Math.PI];
 }
 
-function updateArrayLine(arr, color) {
+function updateArrayLine(arr, color, pulse) {
   const end = destPoint(arr.lat, arr.lon, arr.azimuth, AZ_LINE_M);
   let line = arrayLines.get(arr.id);
   if (!line) {
@@ -151,11 +151,18 @@ function updateArrayLine(arr, color) {
     arrayLines.set(arr.id, line);
   } else {
     line.setLatLngs([[arr.lat, arr.lon], end]);
-    line.setStyle({ color });
+    line.setStyle({ color, weight: 3 });
+  }
+  // Ob spremembi azimuta/naklona za trenutek odebeli črto, da je sprememba
+  // vidna tudi, če je zasuk na trenutnem nivoju približanja majhen.
+  if (pulse) {
+    line.setStyle({ weight: 7, opacity: 1 });
+    clearTimeout(line._pulseT);
+    line._pulseT = setTimeout(() => line.setStyle({ weight: 3, opacity: 0.9 }), 500);
   }
 }
 
-function placeArrayMarker(arr, color) {
+function placeArrayMarker(arr, color, pulse) {
   let m = arrayMarkers.get(arr.id);
   if (!m) {
     m = L.marker([arr.lat, arr.lon], {
@@ -180,7 +187,7 @@ function placeArrayMarker(arr, color) {
     m.setLatLng([arr.lat, arr.lon]);
     m.setIcon(arrayIcon(color, arr.azimuth));
   }
-  updateArrayLine(arr, color);
+  updateArrayLine(arr, color, pulse);
 }
 
 function removeArrayMarker(id) {
@@ -235,7 +242,7 @@ function setHouseLocation(lat, lon, address) {
   map.setView([lat, lon], 19);
   // Če še ni nobenega niza panelov, dodaj privzetega na streho.
   if (state.arrays.length === 0) {
-    addArray({ lat: lat + 0.00006, lon: lon + 0.00006 });
+    addArray({ lat: lat + 0.00015, lon: lon + 0.00012 });
   }
   saveState();
   fetchWeatherAndRender();
@@ -256,8 +263,8 @@ function addArray(overrides) {
     panelCount: 8,
     tilt: 35,
     azimuth: 180,
-    lat: state.lat != null ? state.lat + 0.00005 * n : 46.1512,
-    lon: state.lon != null ? state.lon + 0.00003 * n : 14.9955,
+    lat: state.lat != null ? state.lat + 0.00015 * n : 46.1512,
+    lon: state.lon != null ? state.lon + 0.00012 * n : 14.9955,
   };
   const arr = Object.assign(base, overrides);
   state.arrays.push(arr);
@@ -375,12 +382,15 @@ function arrayCard(arr, color) {
     saveState();
     scheduleRecompute();
   });
-  card.querySelector(".f-az").addEventListener("input", (e) => {
+  const onAzimuthChange = (e) => {
     arr.azimuth = clampNum(e.target.value, 0, 359);
-    placeArrayMarker(arr, color);
+    placeArrayMarker(arr, color, true); // true = za trenutek odebeli črto (viden zasuk)
     saveState();
     scheduleRecompute();
-  });
+  };
+  const azField = card.querySelector(".f-az");
+  azField.addEventListener("input", onAzimuthChange);
+  azField.addEventListener("change", onAzimuthChange); // varovalka za spinner klike na nekaterih brskalnikih
   card.querySelector(".remove").addEventListener("click", () => removeArray(arr.id));
 
   return card;
