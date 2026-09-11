@@ -6,7 +6,7 @@
   <meta name="description" content="Prikaz moči sončnega sevanja (osvetljenosti) za izbrano lokacijo. Podatki: Open-Meteo." />
   <title>Moč sončnega sevanja</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%80%EF%B8%8F%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="style.css?v=4" />
+  <link rel="stylesheet" href="style.css?v=5" />
   <script>
     // Nastavi temo pred izrisom, da ne utripne
     (function () {
@@ -26,6 +26,7 @@
   <div class="wrap">
     <header>
       <h1>☀️ Moč sončnega sevanja</h1>
+      <p class="nav-link"><a href="paneli.html">🔧 Izračunaj pridelavo mojih sončnih panelov →</a></p>
       <div class="controls">
         <label for="location">Kraj</label>
         <input id="location" list="loc-list" autocomplete="off" spellcheck="false"
@@ -92,7 +93,9 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="locations.js?v=4"></script>
-  <script src="app.js?v=4"></script>
+  <script src="locations.js?v=5"></script>
+  <script src="solar.js?v=5"></script>
+  <script src="theme.js?v=5"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

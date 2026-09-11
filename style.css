@@ -66,9 +66,21 @@ canvas { max-width: 100%; }
 }
 
 header h1 {
-  margin: 0 0 16px;
+  margin: 0 0 6px;
   font-size: 1.5rem;
 }
+
+.nav-link {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+}
+
+.nav-link a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.nav-link a:hover { text-decoration: underline; }
 
 .controls {
   display: flex;

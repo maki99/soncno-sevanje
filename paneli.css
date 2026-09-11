@@ -1,0 +1,222 @@
+.search-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.search-row input {
+  flex: 1 1 260px;
+  background: var(--card-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 1rem;
+}
+
+.search-row button,
+.add-btn,
+.array-card .remove {
+  background: var(--accent);
+  color: #1a1200;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.search-row button:hover,
+.add-btn:hover { filter: brightness(1.08); }
+
+.results {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.results li {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.92rem;
+}
+
+.results li:last-child { border-bottom: none; }
+.results li:hover { background: var(--card-2); }
+
+#map {
+  height: 380px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 10px 0 0;
+}
+
+.losses-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.losses-row input {
+  width: 70px;
+  background: var(--card-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 0.95rem;
+}
+
+#arrays {
+  display: grid;
+  gap: 12px;
+}
+
+.array-card {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.array-card .row1 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.array-card .row1 input[type="text"] {
+  flex: 1;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.array-card .swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.array-card .fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.array-card .field label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 3px;
+}
+
+.array-card .field input {
+  width: 100%;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font-size: 0.95rem;
+}
+
+.array-card .field .compass {
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-top: 2px;
+}
+
+.array-card .remove {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.array-card .remove:hover { color: #ff9b9b; border-color: #ff9b9b; }
+
+.breakdown {
+  grid-template-columns: 1fr;
+  gap: 8px !important;
+}
+
+.breakdown li {
+  flex-direction: row !important;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+.breakdown li:last-child { border-bottom: none; }
+
+/* Leaflet markerji */
+.panel-marker {
+  position: relative;
+  width: 26px;
+  height: 26px;
+}
+
+.pm-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid #fff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.pm-arrow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 16px solid;
+  transform-origin: 50% 100%;
+  margin-top: -30px;
+  margin-left: -6px;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
+}
+
+.house-marker {
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+}

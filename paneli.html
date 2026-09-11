@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Vpiši naslov, postavi sončne panele na satelitski posnetek strehe in izračunaj pričakovano pridelavo elektrike." />
+  <title>Moji sončni paneli</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A7%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="paneli.css?v=1" />
+  <script>
+    // Nastavi temo pred izrisom, da ne utripne (skupno z index.html)
+    (function () {
+      try {
+        var t = localStorage.getItem("tema");
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🔧 Moji sončni paneli</h1>
+      <p class="nav-link"><a href="index.html">← Nazaj na sevanje po krajih</a></p>
+      <div class="controls">
+        <button id="theme-toggle" type="button" aria-label="Preklopi temo" style="margin-left:0">
+          <span id="theme-icon">🌙</span><span id="theme-label">Temno</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>1. Poišči svoj naslov</h2>
+        <form id="search-form" class="search-row">
+          <input id="address" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="npr. Prekmurska ulica 5, Murska Sobota" aria-label="Naslov" />
+          <button type="submit">Poišči</button>
+        </form>
+        <ul id="results" class="results" hidden></ul>
+        <p id="geo-status" class="meta"></p>
+        <div id="map"></div>
+        <p class="hint">
+          Povleci moder hišni marker na natančno lokacijo, če geokodiranje ni popolnoma
+          natančno. Za vsak niz panelov spodaj dobiš dodaten marker s puščico, ki kaže
+          smer strehe (azimut) — povleci ga na pravi del strehe.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>2. Nizi panelov</h2>
+        <div class="losses-row">
+          <label for="losses">Sistemske izgube</label>
+          <input id="losses" type="number" min="0" max="50" step="1" value="14" />
+          <span>% (razsmernik, ožičenje, umazanija, senčenje …)</span>
+        </div>
+        <div id="arrays"></div>
+        <button id="add-array" type="button" class="add-btn">+ Dodaj niz panelov</button>
+      </section>
+
+      <section class="card current" aria-live="polite">
+        <div class="current-main">
+          <div class="big"><span id="power-now">–</span><span class="unit">W</span></div>
+          <p class="condition" id="power-condition">Poišči naslov in dodaj vsaj en niz panelov.</p>
+        </div>
+        <ul id="power-breakdown" class="quick breakdown"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Pridelava danes</h2>
+        <div class="chart-box"><canvas id="todayChart"></canvas></div>
+      </section>
+
+      <section class="card">
+        <h2>Napoved za 7 dni</h2>
+        <div class="chart-box"><canvas id="weekChart"></canvas></div>
+        <div id="forecast" class="forecast"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Sevanje: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> ·
+        Iskanje naslovov: <a href="https://nominatim.org/" target="_blank" rel="noopener">Nominatim</a>,
+        © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> sodelavci ·
+        Satelitski posnetki: © Esri, Maxar, Earthstar Geographics<br />
+        Izračun uporablja izotropni model neba (Liu–Jordan) za pretvorbo sevanja na nagnjeno
+        ploskev panelov. Gre za oceno, ne zajamčeno vrednost.
+      </p>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="solar.js?v=5"></script>
+  <script src="theme.js?v=5"></script>
+  <script src="paneli.js?v=1"></script>
+</body>
+</html>

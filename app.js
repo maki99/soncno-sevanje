@@ -8,49 +8,8 @@ let weekChart = null;
 let lastData = null;
 let lastLoc = null;
 
-// ---- Tema (svetla / temna) ----------------------------------------------------
-
-function effectiveTheme() {
-  const saved = localStorage.getItem("tema");
-  if (saved === "light" || saved === "dark") return saved;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  const dark = theme === "dark";
-  const icon = $("theme-icon");
-  const label = $("theme-label");
-  if (icon) icon.textContent = dark ? "☀️" : "🌙";
-  if (label) label.textContent = dark ? "Svetlo" : "Temno";
-}
-
-function toggleTheme() {
-  const next =
-    document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-  localStorage.setItem("tema", next);
-  applyTheme(next);
-  if (lastData) render(lastData, lastLoc); // osveži barve grafov
-}
-
-function initTheme() {
-  applyTheme(effectiveTheme());
-  const btn = $("theme-toggle");
-  if (btn) btn.addEventListener("click", toggleTheme);
-
-  // Sledi sistemu, dokler uporabnik ne izbere ročno
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  mq.addEventListener("change", () => {
-    if (!localStorage.getItem("tema")) {
-      applyTheme(effectiveTheme());
-      if (lastData) render(lastData, lastLoc);
-    }
-  });
-}
-
 // ---- Zagon -----------------------------------------------------------------
+// (Tema je v theme.js, skupna z paneli.html.)
 
 const locByName = new Map(LOCATIONS.map((l) => [l.name.toLowerCase(), l]));
 
@@ -123,42 +82,9 @@ function timeHM(iso) {
   });
 }
 
-// Približna višina sonca nad obzorjem (stopinje) — NOAA poenostavljeni algoritem.
+// Višina sonca (stopinje) — glej solar.js za polni izračun (skupno z paneli.js).
 function sunElevation(date, lat, lon) {
-  const rad = Math.PI / 180;
-  const dayMs = 86400000;
-  const start = Date.UTC(date.getUTCFullYear(), 0, 0);
-  const doy = (Date.UTC(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate()
-  ) - start) / dayMs;
-  const frac =
-    (date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600) /
-    24;
-  const g = 2 * Math.PI * ((doy - 1 + (frac - 0.5)) / 365);
-  const decl =
-    0.006918 -
-    0.399912 * Math.cos(g) +
-    0.070257 * Math.sin(g) -
-    0.006758 * Math.cos(2 * g) +
-    0.000907 * Math.sin(2 * g) -
-    0.002697 * Math.cos(3 * g) +
-    0.00148 * Math.sin(3 * g);
-  const eqtime =
-    229.18 *
-    (0.000075 +
-      0.001868 * Math.cos(g) -
-      0.032077 * Math.sin(g) -
-      0.014615 * Math.cos(2 * g) -
-      0.040849 * Math.sin(2 * g));
-  const tst = frac * 1440 + eqtime + 4 * lon; // pravi sončni čas (min)
-  const ha = (tst / 4 - 180) * rad; // urni kot
-  const latR = lat * rad;
-  const cosZen =
-    Math.sin(latR) * Math.sin(decl) +
-    Math.cos(latR) * Math.cos(decl) * Math.cos(ha);
-  return 90 - Math.acos(Math.max(-1, Math.min(1, cosZen))) / rad;
+  return sunPosition(date, lat, lon).elevation;
 }
 
 // ---- Nalaganje podatkov -------------------------------------------------------
@@ -387,7 +313,9 @@ function drawWeek(data) {
 
 // ---- Osvežuj vsakih 10 minut ----------------------------------------------
 
-initTheme();
+initTheme(() => {
+  if (lastData) render(lastData, lastLoc); // osveži barve grafov
+});
 initLocations();
 load();
 setInterval(load, 10 * 60 * 1000);

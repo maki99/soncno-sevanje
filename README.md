@@ -17,6 +17,20 @@ Podatki o sevanju: [Open-Meteo](https://open-meteo.com/) — brezplačno, brez A
 (vrednosti so modelska napoved, ne meritve).
 Seznam krajev: © [OpenStreetMap](https://www.openstreetmap.org/copyright) sodelavci.
 
+## 🔧 Moji sončni paneli ([paneli.html](https://maki99.github.io/soncno-sevanje/paneli.html))
+
+Druga stran izračuna pričakovano pridelavo tvoje lastne sončne elektrarne:
+
+1. Vpišeš naslov → geokodiranje ([Nominatim](https://nominatim.org/)/OpenStreetMap) najde koordinate
+2. Na satelitskem posnetku (Esri World Imagery) postaviš enega ali več nizov panelov —
+   vsak dobi marker s puščico, ki kaže smer strehe
+3. Za vsak niz vpišeš moč (kWp), naklon in azimut (smer neba)
+4. Iz Open-Meteo urnih podatkov (GHI/DNI/DHI) in položaja sonca izračunamo obsevanost
+   na *tvoji* nagnjeni ploskvi (izotropni model neba, Liu–Jordan) in pretvorimo v W/kWh
+
+Vse (naslov, nizi panelov) se shrani v `localStorage` brskalnika — brez strežnika,
+brez računa.
+
 ## Zagon lokalno
 
 Ni build koraka. Odpri `index.html` v brskalniku, ali poženi lokalni strežnik:
@@ -52,10 +66,15 @@ Ob vsakem `git push` na `main` se stran samodejno posodobi na
 
 | Datoteka | Vsebina |
 |---|---|
-| `index.html` | Ogrodje strani |
-| `style.css` | Oblika (svetla / temna tema) |
+| `index.html` | Stran s sevanjem po krajih |
+| `paneli.html` | Stran z izračunom pridelave mojih panelov |
+| `style.css` | Skupna oblika (svetla / temna tema) |
+| `paneli.css` | Dodatni slog za stran s paneli (zemljevid, kartice nizov) |
+| `theme.js` | Preklop svetla/temna tema (skupno obema stranema) |
+| `solar.js` | Položaj sonca + POA obsevanost (skupno obema stranema) |
 | `locations.js` | Seznam krajev (samodejno ustvarjen) |
-| `app.js` | Iskalnik krajev, klic API-ja, izris grafov |
+| `app.js` | Logika strani s sevanjem po krajih |
+| `paneli.js` | Logika strani s paneli (zemljevid, geokodiranje, izračun) |
 | `tools/build_locations.py` | Skripta za izgradnjo seznama krajev |
 
 ## Licenca
