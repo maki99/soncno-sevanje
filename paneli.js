@@ -100,6 +100,19 @@ function initMap() {
     clearTimeout(resizeT);
     resizeT = setTimeout(() => map.invalidateSize(), 150);
   });
+
+  // Če je zavihek/aplikacija za trenutek v ozadju (zelo pogosto na
+  // mobilnem telefonu — preklop na drugo aplikacijo in nazaj), lahko
+  // Leaflet po vrnitvi napačno meri velikost vsebnika (npr. širino 0).
+  // Posledica: novo narisane/premaknjene azimutne črte se prikažejo kot
+  // ničelne (nevidne). invalidateSize() ob vrnitvi na zavihek to popravi.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      setTimeout(() => map.invalidateSize(), 100);
+    }
+  });
+  window.addEventListener("pageshow", () => map.invalidateSize());
+  window.addEventListener("focus", () => map.invalidateSize());
 }
 
 function placeHouseMarker(lat, lon) {
@@ -139,6 +152,11 @@ function destPoint(lat, lon, bearingDeg, distM) {
 }
 
 function updateArrayLine(arr, color, pulse) {
+  // Varovalka: če je Leaflet nazadnje izmeril vsebnik z velikostjo 0
+  // (glej visibilitychange zgoraj), bi se črta izrisala kot ničelna.
+  const sz = map.getSize();
+  if (sz.x === 0 || sz.y === 0) map.invalidateSize();
+
   const end = destPoint(arr.lat, arr.lon, arr.azimuth, AZ_LINE_M);
   let line = arrayLines.get(arr.id);
   if (!line) {
