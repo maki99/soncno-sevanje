@@ -8,7 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A7%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <link rel="stylesheet" href="style.css?v=5" />
-  <link rel="stylesheet" href="paneli.css?v=1" />
+  <link rel="stylesheet" href="paneli.css?v=2" />
   <script>
     // Nastavi temo pred izrisom, da ne utripne (skupno z index.html)
     (function () {
@@ -48,9 +48,10 @@
         <p id="geo-status" class="meta"></p>
         <div id="map"></div>
         <p class="hint">
-          Povleci moder hišni marker na natančno lokacijo, če geokodiranje ni popolnoma
-          natančno. Za vsak niz panelov spodaj dobiš dodaten marker s puščico, ki kaže
-          smer strehe (azimut) — povleci ga na pravi del strehe.
+          Povleci hišni marker (🏠) na natančno lokacijo, če geokodiranje ni popolnoma
+          natančno. Za vsak niz panelov spodaj dobiš dodaten marker s črtkano
+          <strong>azimutno črto</strong>, ki kaže smer strehe — povleci marker na streho
+          in uskladi črto z robom strehe, da lažje določiš pravi azimut.
         </p>
       </section>
 
@@ -101,6 +102,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="solar.js?v=5"></script>
   <script src="theme.js?v=5"></script>
-  <script src="paneli.js?v=1"></script>
+  <script src="paneli.js?v=2"></script>
 </body>
 </html>

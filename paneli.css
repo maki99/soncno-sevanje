@@ -159,9 +159,18 @@
   padding: 6px 10px;
   font-weight: 400;
   font-size: 0.85rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .array-card .remove:hover { color: #ff9b9b; border-color: #ff9b9b; }
+
+.kwp-total {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.kwp-total strong { color: var(--text); }
 
 .breakdown {
   grid-template-columns: 1fr;

@@ -9,6 +9,7 @@ const COLORS = ["#ffb020", "#5aa9e6", "#7ed957", "#ff6b6b", "#c792ea", "#f6c945"
 let state = loadState();
 let map, houseMarker;
 const arrayMarkers = new Map(); // id -> L.Marker
+const arrayLines = new Map(); // id -> L.Polyline (azimutna črta)
 let weather = null; // zadnji odgovor Open-Meteo
 let todayChart = null;
 let weekChart = null;
@@ -18,11 +19,29 @@ let recomputeTimer = null;
 // ---- Shranjevanje -----------------------------------------------------------
 
 function loadState() {
+  let s = { address: "", lat: null, lon: null, losses: 14, arrays: [] };
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) s = JSON.parse(raw);
   } catch (e) {}
-  return { address: "", lat: null, lon: null, losses: 14, arrays: [] };
+  s.arrays = (s.arrays || []).map(migrateArray);
+  return s;
+}
+
+// Stari zapisi so imeli samo skupno moč niza (kwp). Pretvorimo jih v
+// moč enega panela × število panelov (privzeto 1 panel s to močjo).
+function migrateArray(a) {
+  if (a.panelW == null || a.panelCount == null) {
+    const kwp = a.kwp != null ? a.kwp : 3;
+    a.panelW = Math.round(kwp * 1000);
+    a.panelCount = 1;
+  }
+  delete a.kwp;
+  return a;
+}
+
+function arrayKwp(a) {
+  return (a.panelW * a.panelCount) / 1000;
 }
 
 function saveState() {
@@ -88,6 +107,44 @@ function placeHouseMarker(lat, lon) {
   });
 }
 
+const AZ_LINE_M = 14; // dolžina azimutne črte na zemljevidu (metri)
+
+// Cilj: točka oddaljena `distM` metrov od (lat,lon) v smeri `bearingDeg`.
+function destPoint(lat, lon, bearingDeg, distM) {
+  const R = 6371000;
+  const brng = (bearingDeg * Math.PI) / 180;
+  const lat1 = (lat * Math.PI) / 180;
+  const lon1 = (lon * Math.PI) / 180;
+  const dR = distM / R;
+  const lat2 = Math.asin(
+    Math.sin(lat1) * Math.cos(dR) + Math.cos(lat1) * Math.sin(dR) * Math.cos(brng)
+  );
+  const lon2 =
+    lon1 +
+    Math.atan2(
+      Math.sin(brng) * Math.sin(dR) * Math.cos(lat1),
+      Math.cos(dR) - Math.sin(lat1) * Math.sin(lat2)
+    );
+  return [(lat2 * 180) / Math.PI, (lon2 * 180) / Math.PI];
+}
+
+function updateArrayLine(arr, color) {
+  const end = destPoint(arr.lat, arr.lon, arr.azimuth, AZ_LINE_M);
+  let line = arrayLines.get(arr.id);
+  if (!line) {
+    line = L.polyline([[arr.lat, arr.lon], end], {
+      color,
+      weight: 3,
+      dashArray: "6 5",
+      opacity: 0.9,
+    }).addTo(map);
+    arrayLines.set(arr.id, line);
+  } else {
+    line.setLatLngs([[arr.lat, arr.lon], end]);
+    line.setStyle({ color });
+  }
+}
+
 function placeArrayMarker(arr, color) {
   let m = arrayMarkers.get(arr.id);
   if (!m) {
@@ -95,10 +152,17 @@ function placeArrayMarker(arr, color) {
       icon: arrayIcon(color, arr.azimuth),
       draggable: true,
     }).addTo(map);
+    m.on("drag", () => {
+      const p = m.getLatLng();
+      arr.lat = p.lat;
+      arr.lon = p.lon;
+      updateArrayLine(arr, color);
+    });
     m.on("dragend", () => {
       const p = m.getLatLng();
       arr.lat = p.lat;
       arr.lon = p.lon;
+      updateArrayLine(arr, color);
       saveState();
     });
     arrayMarkers.set(arr.id, m);
@@ -106,6 +170,7 @@ function placeArrayMarker(arr, color) {
     m.setLatLng([arr.lat, arr.lon]);
     m.setIcon(arrayIcon(color, arr.azimuth));
   }
+  updateArrayLine(arr, color);
 }
 
 function removeArrayMarker(id) {
@@ -113,6 +178,11 @@ function removeArrayMarker(id) {
   if (m) {
     map.removeLayer(m);
     arrayMarkers.delete(id);
+  }
+  const line = arrayLines.get(id);
+  if (line) {
+    map.removeLayer(line);
+    arrayLines.delete(id);
   }
 }
 
@@ -172,7 +242,8 @@ function addArray(overrides) {
   const base = {
     id: nextId(),
     name: `Niz ${n}`,
-    kwp: 3,
+    panelW: 400,
+    panelCount: 8,
     tilt: 35,
     azimuth: 180,
     lat: state.lat != null ? state.lat + 0.00005 * n : 46.1512,
@@ -211,12 +282,16 @@ function arrayCard(arr, color) {
     <div class="row1">
       <span class="swatch" style="background:${color}"></span>
       <input type="text" class="f-name" value="${escapeAttr(arr.name)}" aria-label="Ime niza" />
-      <button type="button" class="remove" aria-label="Odstrani niz">✕</button>
+      <button type="button" class="remove" aria-label="Izbriši niz">🗑 Izbriši</button>
     </div>
     <div class="fields">
       <div class="field">
-        <label>Moč (kWp)</label>
-        <input type="number" class="f-kwp" min="0.1" step="0.1" value="${arr.kwp}" />
+        <label>Moč panela (W)</label>
+        <input type="number" class="f-panelw" min="1" step="5" value="${arr.panelW}" />
+      </div>
+      <div class="field">
+        <label>Število panelov</label>
+        <input type="number" class="f-count" min="1" step="1" value="${arr.panelCount}" />
       </div>
       <div class="field">
         <label>Naklon (°)</label>
@@ -227,15 +302,26 @@ function arrayCard(arr, color) {
         <input type="number" class="f-az" min="0" max="359" step="1" value="${arr.azimuth}" />
         <div class="compass">0=S, 90=V, 180=J (optimalno), 270=Z</div>
       </div>
-    </div>`;
+    </div>
+    <div class="kwp-total">Skupna moč niza: <strong class="f-kwp-out">${arrayKwp(arr).toFixed(2)}</strong> kWp</div>`;
+
+  const kwpOut = card.querySelector(".f-kwp-out");
+  const refreshKwp = () => { kwpOut.textContent = arrayKwp(arr).toFixed(2); };
 
   card.querySelector(".f-name").addEventListener("input", (e) => {
     arr.name = e.target.value;
     saveState();
     scheduleRecompute();
   });
-  card.querySelector(".f-kwp").addEventListener("input", (e) => {
-    arr.kwp = parseFloat(e.target.value) || 0;
+  card.querySelector(".f-panelw").addEventListener("input", (e) => {
+    arr.panelW = Math.max(1, parseFloat(e.target.value) || 0);
+    refreshKwp();
+    saveState();
+    scheduleRecompute();
+  });
+  card.querySelector(".f-count").addEventListener("input", (e) => {
+    arr.panelCount = Math.max(1, Math.round(parseFloat(e.target.value) || 0));
+    refreshKwp();
     saveState();
     scheduleRecompute();
   });
@@ -301,7 +387,7 @@ async function fetchWeatherAndRender() {
 function arrayPowerKW(arr, ghi, dni, dhi, sun) {
   const poa = poaIrradiance(ghi, dni, dhi, arr.tilt, arr.azimuth, sun);
   const loss = 1 - (parseFloat(state.losses) || 0) / 100;
-  return (poa / 1000) * arr.kwp * loss;
+  return (poa / 1000) * arrayKwp(arr) * loss;
 }
 
 function computeAndRender() {
