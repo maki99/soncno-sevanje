@@ -273,6 +273,19 @@ function addArray(overrides) {
 // na del zemljevida, ki ni nujno viden, kar je zgledalo, kot da se "nič
 // ne zgodi").
 function focusArray(arr) {
+  // Brez naslova ne moremo ničesar izračunati — namesto da uporabnika
+  // odpeljemo na (za zdaj neuporaben) niz spodaj, ga pošljemo nazaj k
+  // iskanju naslova, sicer je videti, kot da vnosi "ne delajo".
+  if (state.lat == null) {
+    const addr = $("address");
+    addr.scrollIntoView({ behavior: "smooth", block: "center" });
+    addr.classList.add("flash-input");
+    setTimeout(() => addr.classList.remove("flash-input"), 1600);
+    $("geo-status").textContent =
+      "⬆️ Niz je dodan spodaj, a za izračun najprej poišči svoj naslov tukaj.";
+    $("geo-status").classList.remove("error");
+    return;
+  }
   const box = $("arrays");
   const card = box.lastElementChild;
   if (card) {
@@ -476,8 +489,9 @@ function renderEmpty() {
   $("power-now").textContent = "–";
   $("power-condition").textContent =
     state.lat == null
-      ? "Poišči naslov in dodaj vsaj en niz panelov."
-      : "Dodaj vsaj en niz panelov zgoraj.";
+      ? "⬆️ Najprej poišči svoj naslov zgoraj (korak 1) — brez lokacije ni mogoče izračunati sevanja."
+      : "Dodaj vsaj en niz panelov zgoraj (korak 2).";
+  $("power-condition").classList.add("needs-input");
   $("power-breakdown").innerHTML = "";
   if (todayChart) { todayChart.destroy(); todayChart = null; }
   if (weekChart) { weekChart.destroy(); weekChart = null; }
@@ -487,6 +501,7 @@ function renderEmpty() {
 function renderCurrent(totalKW, perArrayNow, sun) {
   const watts = totalKW * 1000;
   $("power-now").textContent = watts >= 0 ? Math.round(watts).toLocaleString("sl-SI") : "0";
+  $("power-condition").classList.remove("needs-input");
   $("power-condition").textContent =
     sun.elevation <= 0
       ? "Sonce je pod obzorjem — brez pridelave"

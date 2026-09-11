@@ -12,6 +12,12 @@
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 1rem;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.search-row input.flash-input {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.35);
 }
 
 .search-row button,
@@ -178,6 +184,11 @@
 }
 
 .kwp-total strong { color: var(--text); }
+
+.condition.needs-input {
+  color: var(--accent);
+  font-weight: 600;
+}
 
 .breakdown {
   grid-template-columns: 1fr;
